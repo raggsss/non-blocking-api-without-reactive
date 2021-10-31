@@ -14,6 +14,13 @@ To install rahul.assessment, just mvn install on the project root directory.
 
 Run SpringBootDemoApplication as a java application (default port 8081)
 
+### For accessing the Rest API
+
+There is only a single rest api created for this project-
+http://localhost:8081/{id}
+
+e.g. http://localhost:8081/9
+
 
 ### Runninng test cases
 
