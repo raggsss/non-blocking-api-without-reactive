@@ -65,4 +65,9 @@ public class RandomIDServiceImpl implements RandomIDService {
 	public List<RandomIDModel> getAllRandomModels() {
 		return randomIDDao.getAllRandomModels();
 	}
+
+	@Override
+	public List<RandomIDModel> getRandomModelsByCountThreashold(int countThreshold) {
+		return randomIDDao.getRandomModelsByCountThreshold(countThreshold);
+	}
 }

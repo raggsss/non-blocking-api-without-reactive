@@ -33,76 +33,78 @@ import com.supertokens.assessment.service.RandomIDServiceImpl;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = SpringBootDemoApplication.class)
 public class RandomIDSpringTest {
-	
+
 	@SpyBean
 	private CronJobForCleaningRandomID cronJob;
-	
+
 	@Mock
 	private RandomIDService randomIDService;
-	
+
 	@Mock
 	private RandomIDDao randomIDDao;
-	
+
 	@Mock
 	private RandomIDModel rmd;
 
-	
 	@Before
 	public void setUp() {
 		reset(randomIDDao);
 		reset(randomIDService);
 	}
-	
+
 	@Test
 	public void addCountTestForEven() {
-		
+
 		int randomID = 2;
 		rmd.setId(randomID);
 		rmd.setCount(randomID);
 		when(randomIDDao.getRandomIDModel(randomID)).thenReturn(rmd);
 		randomIDService.addCount(2);
-		when(rmd.getCount()).thenReturn(randomID+Constants.INCREMENT_FOR_EVEN);
-		assertEquals((rmd.getCount()), (randomID+Constants.INCREMENT_FOR_EVEN));
+		when(rmd.getCount()).thenReturn(randomID + Constants.INCREMENT_FOR_EVEN);
+		assertEquals((rmd.getCount()), (randomID + Constants.INCREMENT_FOR_EVEN));
 	}
-	
+
 	@Test
 	public void addCountTestForOdd() {
-		
+
 		int randomID = 3;
 		rmd.setId(randomID);
 		rmd.setCount(randomID);
 		when(randomIDDao.getRandomIDModel(randomID)).thenReturn(rmd);
 		randomIDService.addCount(2);
-		when(rmd.getCount()).thenReturn(randomID+Constants.INCREMENT_FOR_ODD);
-		assertEquals((rmd.getCount()), (randomID+Constants.INCREMENT_FOR_ODD));
+		when(rmd.getCount()).thenReturn(randomID + Constants.INCREMENT_FOR_ODD);
+		assertEquals((rmd.getCount()), (randomID + Constants.INCREMENT_FOR_ODD));
 	}
-	
+
 	@Test
 	public void cleanRandomIDInnerTest() {
-		
+
 		RandomIDService randomIDService = mock(RandomIDServiceImpl.class);
 		CronJobForCleaningRandomID cronJob = spy(CronJobForCleaningRandomID.class);
 		cronJob.setRandomIDService(randomIDService);
-		
-		List<RandomIDModel> rmds = new ArrayList<RandomIDModel>(){{
-			add(new RandomIDModel(1, 1));
-			add(new RandomIDModel(2, 2));
-			add(new RandomIDModel(3, 15));
-			add(new RandomIDModel(4, 20));
-		}};
-		
+
+		List<RandomIDModel> rmds = new ArrayList<RandomIDModel>() {
+			{
+				add(new RandomIDModel(1, 12));
+				add(new RandomIDModel(2, 22));
+				add(new RandomIDModel(3, 16));
+				add(new RandomIDModel(4, 20));
+			}
+		};
+
 		ArrayList<Integer> ids = new ArrayList<Integer>();
+		ids.add(1);
+		ids.add(2);
+		ids.add(3);
 		ids.add(4);
-		
-		when(randomIDService.getAllRandomModels()).thenReturn(rmds);
-		cronJob.cleanRandomIDInner();
+
+		when(randomIDService.getRandomModelsByCountThreashold(10)).thenReturn(rmds);
+		cronJob.cleanRandomIDInner2();
 		verify(randomIDService, times(1)).removeRandomModelsByListOfIds(ids);
 	}
-	
+
 	@Test
-    public void whenWaitFiveSecondVerifyCleanRandomIDIsCalledAtLeastTwoTimes() {
-        await()
-          .atMost(Duration.FIVE_SECONDS)
-          .untilAsserted(() -> verify(cronJob, atLeast(4)).cleanRandomID());
-    }
+	public void whenWaitFiveSecondVerifyCleanRandomIDIsCalledAtLeastTwoTimes() {
+		await().atMost(Duration.FIVE_SECONDS).untilAsserted(() -> verify(cronJob, atLeast(2)).cleanRandomID());
+	}
 }

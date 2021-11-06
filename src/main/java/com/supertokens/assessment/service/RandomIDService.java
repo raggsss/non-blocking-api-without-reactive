@@ -9,4 +9,5 @@ public interface RandomIDService {
 	public void addCount(int id);
 	public int removeRandomModelsByListOfIds(List<Integer> ids);
 	public List<RandomIDModel> getAllRandomModels();
+	public List<RandomIDModel> getRandomModelsByCountThreashold(int countThreshold);
 }
