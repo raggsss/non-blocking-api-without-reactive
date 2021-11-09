@@ -2,6 +2,7 @@ package com.supertokens.assessment;
 
 import static org.awaitility.Awaitility.await;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
@@ -14,15 +15,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.awaitility.Duration;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.test.context.junit4.SpringRunner;
 
-import com.supertokens.assessment.SpringBootDemoApplication;
 import com.supertokens.assessment.constants.Constants;
 import com.supertokens.assessment.cron.CronJobForCleaningRandomID;
 import com.supertokens.assessment.dao.RandomIDDao;
@@ -30,26 +30,28 @@ import com.supertokens.assessment.model.RandomIDModel;
 import com.supertokens.assessment.service.RandomIDService;
 import com.supertokens.assessment.service.RandomIDServiceImpl;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = SpringBootDemoApplication.class)
-public class RandomIDSpringTest {
+public class RandomIDSpringTest extends BaseTest {
 
 	@SpyBean
 	private CronJobForCleaningRandomID cronJob;
-
-	@Mock
-	private RandomIDService randomIDService;
-
+	
 	@Mock
 	private RandomIDDao randomIDDao;
 
 	@Mock
 	private RandomIDModel rmd;
-
+	
+	@InjectMocks
+	private RandomIDServiceImpl randomIDService;
+	
 	@Before
+	public void setUpAll() {
+		MockitoAnnotations.initMocks(this);
+	}
+
+	@After
 	public void setUp() {
 		reset(randomIDDao);
-		reset(randomIDService);
 	}
 
 	@Test
@@ -58,7 +60,7 @@ public class RandomIDSpringTest {
 		int randomID = 2;
 		rmd.setId(randomID);
 		rmd.setCount(randomID);
-		when(randomIDDao.getRandomIDModel(randomID)).thenReturn(rmd);
+		when(randomIDDao.getRandomIDModelMakePessimisticWriteLockOnById(anyInt())).thenReturn(rmd);
 		randomIDService.addCount(2);
 		when(rmd.getCount()).thenReturn(randomID + Constants.INCREMENT_FOR_EVEN);
 		assertEquals((rmd.getCount()), (randomID + Constants.INCREMENT_FOR_EVEN));
@@ -70,7 +72,7 @@ public class RandomIDSpringTest {
 		int randomID = 3;
 		rmd.setId(randomID);
 		rmd.setCount(randomID);
-		when(randomIDDao.getRandomIDModel(randomID)).thenReturn(rmd);
+		when(randomIDDao.getRandomIDModelMakePessimisticWriteLockOnById(randomID)).thenReturn(rmd);
 		randomIDService.addCount(2);
 		when(rmd.getCount()).thenReturn(randomID + Constants.INCREMENT_FOR_ODD);
 		assertEquals((rmd.getCount()), (randomID + Constants.INCREMENT_FOR_ODD));
@@ -84,6 +86,8 @@ public class RandomIDSpringTest {
 		cronJob.setRandomIDService(randomIDService);
 
 		List<RandomIDModel> rmds = new ArrayList<RandomIDModel>() {
+			private static final long serialVersionUID = 1L;
+
 			{
 				add(new RandomIDModel(1, 12));
 				add(new RandomIDModel(2, 22));
@@ -92,11 +96,12 @@ public class RandomIDSpringTest {
 			}
 		};
 
-		ArrayList<Integer> ids = new ArrayList<Integer>();
-		ids.add(1);
-		ids.add(2);
-		ids.add(3);
-		ids.add(4);
+		ArrayList<Integer> ids = new ArrayList<Integer>() {{
+			add(1);
+			add(2);
+			add(3);
+			add(4);
+		}};
 
 		when(randomIDService.getRandomModelsByCountThreashold(10)).thenReturn(rmds);
 		cronJob.cleanRandomIDInner2();

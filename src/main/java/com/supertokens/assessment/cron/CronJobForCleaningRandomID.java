@@ -2,8 +2,6 @@ package com.supertokens.assessment.cron;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -13,6 +11,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.supertokens.assessment.constants.Constants;
+import com.supertokens.assessment.helper.ThreadHelper;
 import com.supertokens.assessment.model.RandomIDModel;
 import com.supertokens.assessment.service.RandomIDService;
 
@@ -35,7 +34,7 @@ public class CronJobForCleaningRandomID {
 		long currentTimeMillis = System.currentTimeMillis() / 1000;
 
 		logger.info("Started with cleaning ids " + currentTimeMillis);
-		sleep(DELAY);
+		ThreadHelper.sleep(DELAY);
 		cleanRandomIDInner2();
 		logger.info("Cleaning task executed " + currentTimeMillis);
 	}
@@ -62,13 +61,6 @@ public class CronJobForCleaningRandomID {
 
 		if (!ids.isEmpty()) {
 			randomIDService.removeRandomModelsByListOfIds(ids);
-		}
-	}
-
-	private void sleep(int delay) {
-		try {
-			Thread.sleep(delay);
-		} catch (InterruptedException e) {
 		}
 	}
 }

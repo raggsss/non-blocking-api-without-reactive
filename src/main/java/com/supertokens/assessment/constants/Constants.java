@@ -12,4 +12,7 @@ public class Constants {
 	
 	// Scheduled fixed rate
 	public static final int SCHEDULED_FIXED_RATE = 8000;
+	
+	//Thread related constants
+	public static final int LOCK_EXCEPTION_RETRY_AFTER_MS = 300;
 }
