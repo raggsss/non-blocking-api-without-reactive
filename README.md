@@ -30,7 +30,4 @@ Run RandomIDSpringTest as a junit application.
 ### H2-console embedded database
 
 H2 is the in-memory database, i.e. it only exists when application is running.
-For accessing / viewing the database, head over to http://localhost:8081/h2-console and provide the data as shown below
-
-
-![alt custom_hooks](./images/super1.png)
+For accessing / viewing the database, head over to http://localhost:8081/h2-console
