@@ -8,7 +8,7 @@
 
 ### Installation
 
-To install rahul.assessment, just mvn install on the project root directory.
+To install, just mvn install on the project root directory.
 
 ### Runnning the application
 
