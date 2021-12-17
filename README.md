@@ -1,4 +1,4 @@
-## Rahul's supertokens assessment
+## Non blocking I/O with non-reactive programming
 =========================
  
 - Create an API that takes a random ID and increments a number in a db against that ID. If the current number against that ID is even, it will add 3 to the number, otherwise, it will add 1 to the number.
